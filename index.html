@@ -220,7 +220,7 @@
     flex-direction: column;
   }
 
-  .topbar {
+    .topbar {
     height: var(--nav-h);
     display: flex;
     align-items: center;
@@ -232,6 +232,10 @@
     top: 0;
     z-index: 50;
     overflow: visible;
+    /* Add safe area padding for notches */
+    padding-top: env(safe-area-inset-top);
+    padding-left: max(28px, env(safe-area-inset-left));
+    padding-right: max(28px, env(safe-area-inset-right));
   }
 
   .topbar-title {
@@ -244,14 +248,24 @@
 
   .topbar-actions { display: flex; align-items: center; gap: 10px; }
 
-  .menu-toggle {
+    .menu-toggle {
     display: none;
     background: none;
     border: none;
     color: var(--text);
-    font-size: 22px;
+    font-size: 24px;
     cursor: pointer;
-    padding: 6px;
+    padding: 10px;
+    margin: 0;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 8px;
+    position: relative;
+    z-index: 60;
+  }
+  
+  .menu-toggle:active {
+    background: var(--bg4);
   }
 
   .page { display: none; padding: 28px; }
@@ -821,6 +835,26 @@
 
   @media (max-width: 480px) {
     .grid-2 { grid-template-columns: 1fr; }
+    
+    .topbar {
+      padding-top: env(safe-area-inset-top);
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+    }
+    
+    .main-content {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    .page {
+      padding-top: max(16px, env(safe-area-inset-top));
+    }
+    
+    /* Make sure menu button is always tappable */
+    .menu-toggle {
+      margin-right: 4px;
+      margin-left: -4px;
+    }
   }
 
   /* ── GLOW PULSE ── */
@@ -1384,7 +1418,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Date</label>
-          <input type="date" class="form-input" id="logDate">
+          <input type="date" class="form-input" id="logDate" style="display: block; width: 100%;">
         </div>
         <div class="form-group">
           <label class="form-label">Notes (optional)</label>
