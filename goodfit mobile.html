@@ -1,0 +1,3506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>GoodFit</title>
+
+<!-- PWA Meta -->
+<meta name="application-name" content="GoodFit">
+<meta name="description" content="Your personal fitness tracker — log workouts, track progress, hit PRs.">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GoodFit">
+
+<!-- iOS Icons (inline SVG → data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230a0a0f'/%3E%3Ctext x='90' y='118' font-family='Georgia%2C serif' font-size='90' font-style='italic' font-weight='400' fill='%23c8f060' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0a0f'/%3E%3Ctext x='16' y='24' font-family='Georgia%2C serif' font-size='22' font-style='italic' fill='%23c8f060' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E">
+
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22GoodFit%22%2C%22short_name%22%3A%22GoodFit%22%2C%22description%22%3A%22Your%20personal%20fitness%20tracker%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0f%22%2C%22theme_color%22%3A%22%230a0a0f%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520192%2520192'%253E%253Crect%2520width%3D'192'%2520height%3D'192'%2520rx%3D'40'%2520fill%3D'%25230a0a0f'%2F%253E%253Ctext%2520x%3D'96'%2520y%3D'128'%2520font-family%3D'Georgia%2Cserif'%2520font-size%3D'96'%2520font-style%3D'italic'%2520fill%3D'%2523c8f060'%2520text-anchor%3D'middle'%253EG%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --bg4: #22222f;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --border2: #363650;
+    --accent: #c8f060;
+    --accent2: #a8e040;
+    --accent-dim: rgba(200,240,96,0.12);
+    --accent-glow: rgba(200,240,96,0.25);
+    --text: #f0f0f5;
+    --text2: #a0a0b5;
+    --text3: #606075;
+    --red: #ff5c5c;
+    --orange: #ffaa55;
+    --blue: #5cb8ff;
+    --purple: #b05cff;
+    --pink: #ff5cb8;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Mono', monospace;
+    --font-serif: 'Fraunces', serif;
+    --nav-h: 64px;
+    --sidebar-w: 260px;
+    --transition: all 0.2s ease;
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f0;
+    --bg2: #ebebE6;
+    --bg3: #e0e0da;
+    --bg4: #d5d5cf;
+    --card: #ffffff;
+    --border: #d8d8d0;
+    --border2: #c0c0b8;
+    --text: #1a1a2e;
+    --text2: #505060;
+    --text3: #909098;
+    --shadow: 0 4px 32px rgba(0,0,0,0.1);
+    --btn-text: #ffffff;
+  }
+
+  [data-theme="forest"] {
+    --bg: #0d1a0d;
+    --bg2: #111f11;
+    --bg3: #162416;
+    --bg4: #1c2c1c;
+    --card: #131c13;
+    --border: #243024;
+    --border2: #2e3c2e;
+    --text: #e8f5e8;
+    --text2: #8fa88f;
+    --text3: #4a5e4a;
+    --btn-text: #0d1a0d;
+  }
+
+  [data-theme="ocean"] {
+    --bg: #050d1a;
+    --bg2: #081220;
+    --bg3: #0c1a2c;
+    --bg4: #102038;
+    --card: #0a1525;
+    --border: #1a2e46;
+    --border2: #243c58;
+    --text: #e0f4ff;
+    --text2: #7aadcc;
+    --text3: #3a6080;
+    --btn-text: #050d1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Prevent descender clipping on Syne (font-head) — achieved by clip-path none on parents */
+  .topbar-title,
+  .exercise-name,
+  .card-title,
+  .modal-title,
+  .section-title {
+    line-height: 1.4;
+    overflow: visible;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+    /* iOS safe area */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ── LAYOUT ── */
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    overflow: visible;
+  }
+  .logo-text {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    font-style: italic;
+    line-height: 1.4;
+    overflow: visible;
+    display: block;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+  }
+
+  .nav-section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 8px 10px 6px;
+    margin-top: 8px;
+    font-family: var(--font-head);
+    font-weight: 700;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+    margin-bottom: 2px;
+    user-select: none;
+  }
+
+  .nav-item:hover { background: var(--bg4); color: var(--text); }
+  .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+  .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    overflow: visible;
+  }
+
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow: visible;
+  }
+
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 6px;
+  }
+
+  .page { display: none; padding: 28px; }
+  .page.active { display: block; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-align: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--btn-text, #0a0a0f);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--border2); color: var(--text); background: var(--bg4); }
+
+  .btn-danger {
+    background: rgba(255,92,92,0.15);
+    color: var(--red);
+    border: 1px solid rgba(255,92,92,0.3);
+  }
+  .btn-danger:hover { background: rgba(255,92,92,0.25); }
+
+  .btn-icon {
+    padding: 9px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: var(--radius-sm);
+  }
+  .btn-icon:hover { color: var(--accent); border-color: var(--accent); }
+
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    overflow: visible;
+  }
+
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow: visible;
+  }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+  /* ── STAT CARDS ── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .stat-label { font-size: 11px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 11px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    transition: var(--transition);
+    outline: none;
+  }
+
+  .form-input:focus { border-color: var(--accent); background: var(--bg4); }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23606075'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  textarea.form-input { resize: vertical; min-height: 80px; }
+
+  /* ── TAGS / PILLS ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    background: var(--bg4);
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+
+  .tag.accent { background: var(--accent-dim); color: var(--accent); border-color: transparent; }
+
+  /* ── CHART CONTAINER ── */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  /* ── EXERCISE LIST ── */
+  .exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .exercise-item:hover { border-color: var(--border2); background: var(--bg4); }
+  .exercise-item.selected { border-color: var(--accent); background: var(--accent-dim); }
+
+  .exercise-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--accent-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .exercise-name { font-family: var(--font-head); font-size: 14px; font-weight: 600; line-height: 1.4; overflow: visible; }
+  .exercise-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .exercise-badge { margin-left: auto; flex-shrink: 0; }
+
+  /* ── LOG ENTRY ── */
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+
+  .log-date {
+    width: 90px;
+    flex-shrink: 0;
+    color: var(--text3);
+    font-size: 11px;
+  }
+
+  .log-value {
+    font-family: var(--font-head);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .log-notes { color: var(--text2); font-size: 12px; flex: 1; }
+
+  .log-actions { margin-left: auto; display: flex; gap: 6px; }
+
+  /* ── CALENDAR ── */
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text3);
+    padding: 4px;
+    letter-spacing: 1px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    background: var(--bg3);
+    border: 1px solid transparent;
+    color: var(--text2);
+  }
+
+  .cal-day:hover { border-color: var(--border2); }
+  .cal-day.today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .cal-day.has-workout { background: var(--accent-dim); color: var(--text); }
+  .cal-day.has-workout::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+  .cal-day.rest-day { opacity: 0.4; }
+  .cal-day.scheduled { border-color: var(--accent-dim); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .modal-body { padding: 22px 24px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 24px 22px; border-top: 1px solid var(--border); }
+
+  /* ── TOAST ── */
+  #toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .toast {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    animation: slideInToast 0.3s ease;
+  }
+
+  .toast.error { border-left-color: var(--red); }
+  .toast.info { border-left-color: var(--blue); }
+
+  @keyframes slideInToast {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg3);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text3);
+    transition: var(--transition);
+    user-select: none;
+  }
+
+  .tab.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+  /* ── TOGGLE ── */
+  .toggle-wrap { display: flex; align-items: center; gap: 12px; }
+
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--text3);
+    transition: var(--transition);
+  }
+
+  .toggle.on::after { background: var(--bg); left: 23px; }
+
+  /* ── COLOR DOTS ── */
+  .color-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .color-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+  }
+
+  .color-dot:hover, .color-dot.active { transform: scale(1.15); border-color: var(--text); }
+
+  /* ── PROGRESS RING ── */
+  .progress-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-family: var(--font-head); font-size: 18px; color: var(--text2); margin-bottom: 8px; }
+  .empty-sub { font-size: 13px; }
+
+  /* ── HEATMAP ── */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
+    gap: 2px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--bg4);
+    min-width: 8px;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .heatmap-cell:hover { opacity: 0.8; transform: scale(1.2); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* ── WEEK SCHEDULE ── */
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+
+  .day-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--bg3);
+  }
+
+  .day-toggle.active { border-color: var(--accent); background: var(--accent-dim); }
+  .day-toggle .day-name { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+  .day-toggle .day-icon { font-size: 18px; }
+
+  /* ── CHART CONTROLS ── */
+  .chart-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .chip {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    cursor: pointer;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    transition: var(--transition);
+    user-select: none;
+  }
+
+  .chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .chip:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+  /* ── SETTINGS ── */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row:last-child { border-bottom: none; }
+  .settings-label { font-size: 14px; }
+  .settings-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    :root { --nav-h: 58px; }
+
+    .sidebar {
+      transform: translateX(-100%);
+      width: 280px;
+    }
+
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+      display: none;
+    }
+
+    .sidebar-backdrop.open { display: block; }
+
+    .main-content { margin-left: 0; }
+
+    .menu-toggle { display: block; }
+
+    .page { padding: 16px; }
+
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .stat-card .stat-value { font-size: 24px; }
+
+    .topbar { padding: 0 16px; }
+
+    #toast-container { right: 12px; bottom: 12px; left: 12px; }
+
+    .chart-controls { gap: 6px; }
+    .chip { padding: 5px 10px; font-size: 10px; }
+    
+    .heatmap-grid { grid-template-columns: repeat(26, 1fr); }
+    
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; }
+    
+    .log-entry { flex-wrap: wrap; }
+    
+    .modal { max-height: 95vh; }
+  }
+
+  @media (max-width: 480px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ── GLOW PULSE ── */
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 transparent; }
+    50% { box-shadow: 0 0 20px var(--accent-glow); }
+  }
+
+  .glow { animation: glow-pulse 2s infinite; }
+
+  /* ── SECTION SPACING ── */
+  .section { margin-bottom: 24px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .pr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,170,85,0.15);
+    color: var(--orange);
+    border-radius: 100px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .improvement-chip {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 100px;
+  }
+
+  .positive { background: var(--accent-dim); color: var(--accent); }
+  .negative { background: rgba(255,92,92,0.12); color: var(--red); }
+
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .gap-4 { gap: 16px; }
+  .mt-4 { margin-top: 16px; }
+  .mb-3 { margin-bottom: 12px; }
+  .w-full { width: 100%; }
+  .flex-1 { flex: 1; }
+  .text-accent { color: var(--accent); }
+  .text-sm { font-size: 12px; }
+  .text-muted { color: var(--text3); }
+
+  .inline-flex { display: inline-flex; }
+
+  /* ── WELCOME OVERLAY ── */
+  .welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .welcome-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .welcome-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 36px 32px;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    transform: translateY(24px) scale(0.97);
+    transition: transform 0.35s ease;
+  }
+
+  .welcome-overlay.open .welcome-card {
+    transform: translateY(0) scale(1);
+  }
+
+  .welcome-logo {
+    font-family: var(--font-serif);
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--accent);
+    font-style: italic;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .welcome-tagline {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 28px;
+  }
+
+  .welcome-heading {
+    font-family: var(--font-head);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .welcome-sub {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .welcome-photo-area {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px dashed var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    overflow: hidden;
+    margin: 0 auto 20px;
+    background: var(--bg3);
+    font-size: 26px;
+    line-height: 1;
+    position: relative;
+  }
+
+  .welcome-photo-area:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+  .welcome-photo-area img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .welcome-skip {
+    display: block;
+    margin: 18px auto 0;
+    font-size: 11px;
+    color: var(--text3);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+    text-align: center;
+    width: 100%;
+  }
+
+  .welcome-skip:hover { color: var(--text2); }
+
+  /* Radial bg decoration */
+  .page-bg-glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(60px);
+    opacity: 0.3;
+    top: -200px; right: -200px;
+  }
+
+  /* ── CONFIRM MODAL ── */
+  .confirm-modal {
+    max-width: 380px;
+  }
+
+  .confirm-modal .modal-body {
+    text-align: center;
+    padding: 28px 24px 16px;
+  }
+
+  .confirm-icon {
+    font-size: 40px;
+    margin-bottom: 14px;
+  }
+
+  .confirm-title {
+    font-family: var(--font-head);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .confirm-message {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── PROFILE BOX ── */
+  .profile-box {
+    margin: 0 12px 10px;
+    padding: 8px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+  }
+
+  .profile-box:hover { border-color: var(--border2); }
+
+  .profile-box-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .profile-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    border: 1.5px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-name {
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-chevron {
+    font-size: 13px;
+    color: var(--text2);
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .profile-dropdown {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    z-index: 200;
+    overflow: hidden;
+    display: none;
+  }
+
+  .profile-dropdown.open { display: block; }
+
+  .profile-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text2);
+    transition: var(--transition);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .profile-dropdown-item:last-child { border-bottom: none; }
+  .profile-dropdown-item:hover { background: var(--bg4); color: var(--text); }
+  .profile-dropdown-item.active-profile { color: var(--accent); background: var(--accent-dim); }
+
+  .profile-dropdown-item .pd-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .profile-dropdown-item .pd-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  .create-account-btn {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    color: var(--accent);
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .create-account-btn:hover { background: var(--accent-dim); }
+
+  /* ── PHOTO UPLOAD ── */
+  .photo-upload-area {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px dashed var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    overflow: hidden;
+    margin: 0 auto 16px;
+    background: var(--bg3);
+    font-size: 28px;
+    line-height: 1;
+    position: relative;
+  }
+
+  .photo-upload-area:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+  .photo-upload-area img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Accounts list in settings */
+  .account-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .account-item:last-child { border-bottom: none; }
+
+  .account-item-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .account-item-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="page-bg-glow"></div>
+<div id="toast-container"></div>
+
+<!-- SIDEBAR BACKDROP -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">GoodFit</div>
+    <div class="logo-sub">Track · Improve · Thrive</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <span class="icon">⚡</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('exercises', this)">
+      <span class="icon">🏋️</span> Exercises
+    </div>
+    <div class="nav-item" onclick="showPage('log', this)">
+      <span class="icon">📋</span> Log Workout
+    </div>
+    <div class="nav-section-label">Analysis</div>
+    <div class="nav-item" onclick="showPage('progress', this)">
+      <span class="icon">📈</span> Progress
+    </div>
+    <div class="nav-item" onclick="showPage('calendar', this)">
+      <span class="icon">📅</span> Schedule
+    </div>
+    <div class="nav-section-label">More</div>
+    <div class="nav-item" onclick="showPage('notes', this)">
+      <span class="icon">📝</span> Notes
+    </div>
+    <div class="nav-item" onclick="showPage('settings', this)">
+      <span class="icon">⚙️</span> Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <!-- Profile box: only shown when at least one account exists -->
+    <div id="profileBox" class="profile-box" onclick="toggleProfileDropdown(event)" style="display:none;">
+      <div class="profile-box-inner">
+        <div class="profile-avatar" id="sidebarAvatar"><span id="sidebarAvatarEmoji" style="font-size:12px;">👤</span></div>
+        <div class="profile-name" id="sidebarProfileName"></div>
+        <span class="profile-chevron" id="profileChevron">▲</span>
+      </div>
+      <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+        <div id="profileSwitchList"></div>
+        <button class="create-account-btn" onclick="openCreateAccountModal(); closeProfileDropdown();">+ Create Account</button>
+      </div>
+    </div>
+    <!-- Create Account button: shown when no accounts, hidden once one exists -->
+    <button class="btn btn-primary w-full" id="createAccountFooterBtn" style="margin-bottom:8px;font-size:12px;" onclick="openCreateAccountModal()">Create Account</button>
+    <div style="text-align:center;padding-bottom:4px;">
+      <span style="font-size:11px;color:var(--text3);">GoodFit v1.0</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openLogModal()">Quick Log</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('exercises',null)">Exercises</button>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="section">
+      <div class="grid-4" id="statsGrid"></div>
+    </div>
+
+    <div class="grid-2 section">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Activity</span>
+          <span class="badge" id="streakBadge">— streak</span>
+        </div>
+        <div id="recentActivity"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">This Week</span>
+        </div>
+        <div id="weekSummary"></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <div class="card-header">
+        <span class="card-title">Activity Heatmap</span>
+        <span style="font-size:11px;color:var(--text3)">Last 6 months</span>
+      </div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:10px;" id="heatmapLegend">
+        <span style="font-size:10px;color:var(--text3);">Less</span>
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--bg4)"></div>
+        <div id="heatLeg1" style="width:10px;height:10px;border-radius:2px;"></div>
+        <div id="heatLeg2" style="width:10px;height:10px;border-radius:2px;"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>
+        <span style="font-size:10px;color:var(--text3);">More</span>
+      </div>
+    </div>
+
+    <div class="card section">
+      <div class="card-header">
+        <span class="card-title">Personal Records 🏆</span>
+      </div>
+      <div id="prGrid" class="grid-3"></div>
+    </div>
+  </div>
+
+  <!-- ══ EXERCISES ══ -->
+  <div class="page" id="page-exercises">
+    <div class="grid-2">
+      <div>
+        <div class="section-header">
+          <span class="section-title">Your Exercises</span>
+          <button class="btn btn-primary btn-sm" onclick="openExerciseModal()">+ New</button>
+        </div>
+        <div id="exerciseList"></div>
+      </div>
+      <div id="exerciseDetailPanel">
+        <div class="empty-state">
+          <div class="empty-icon">🏋️</div>
+          <div class="empty-title">Select an exercise</div>
+          <div class="empty-sub">Click any exercise to view details and history</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOG WORKOUT ══ -->
+  <div class="page" id="page-log">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Log a Set</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Exercise</label>
+          <select class="form-input form-select" id="logExerciseSelect"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Value</label>
+          <div style="display:flex;gap:10px;">
+            <input type="number" class="form-input" id="logValue" placeholder="0" style="flex:1;" step="0.5" min="0">
+            <div id="logUnitDisplay" style="display:flex;align-items:center;padding:0 14px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--accent);min-width:60px;justify-content:center;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="logDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <input type="text" class="form-input" id="logNotes" placeholder="Felt strong today...">
+        </div>
+        <button class="btn btn-primary w-full" onclick="submitLog()">Log Entry</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Logs</span>
+          <select class="form-input form-select" id="recentLogsFilter" style="width:auto;font-size:12px;padding:6px 28px 6px 10px;" onchange="renderRecentLogs()"></select>
+        </div>
+        <div id="recentLogsList" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROGRESS ══ -->
+  <div class="page" id="page-progress">
+    <div class="card section">
+      <div class="card-header">
+        <span class="card-title">Progress Chart</span>
+      </div>
+      <div class="chart-controls">
+        <select class="form-input form-select" id="progressExerciseSelect" style="width:auto;font-size:12px;padding:6px 28px 6px 10px;" onchange="renderProgressChart()"></select>
+        <div style="display:flex;gap:4px;">
+          <span class="chip active" data-range="1m" onclick="setRange(this,'1m')">1M</span>
+          <span class="chip" data-range="3m" onclick="setRange(this,'3m')">3M</span>
+          <span class="chip" data-range="6m" onclick="setRange(this,'6m')">6M</span>
+          <span class="chip" data-range="1y" onclick="setRange(this,'1y')">1Y</span>
+          <span class="chip" data-range="all" onclick="setRange(this,'all')">All</span>
+        </div>
+        <div style="display:flex;gap:4px;margin-left:auto;">
+          <span class="chip active" data-chart="line" onclick="setChartType(this,'line')">Line</span>
+          <span class="chip" data-chart="bar" onclick="setChartType(this,'bar')">Bar</span>
+          <span class="chip" data-chart="scatter" onclick="setChartType(this,'scatter')">Scatter</span>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:320px;">
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-3 section" id="progressStats"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Multi-Exercise Comparison</span>
+        <span style="font-size:11px;color:var(--text3);">Normalized to %</span>
+      </div>
+      <div class="chart-wrap" style="height:280px;">
+        <canvas id="compareChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CALENDAR ══ -->
+  <div class="page" id="page-calendar">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+          <span class="card-title" id="calMonthTitle">Month</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">‹</button>
+            <button class="btn btn-ghost btn-sm" onclick="calNav(1)">›</button>
+            <button class="btn btn-ghost btn-sm" onclick="calGoToday()">Today</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+      </div>
+
+      <div>
+        <div class="card section">
+          <div class="card-header">
+            <span class="card-title">Workout Schedule</span>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Select which days you typically work out</p>
+          <div class="week-grid" id="weekScheduleGrid"></div>
+        </div>
+
+        <div class="card" id="calDayDetail">
+          <div class="card-title" style="margin-bottom:12px;">Select a Day</div>
+          <div style="color:var(--text3);font-size:13px;">Click a date on the calendar to see that day's activity.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NOTES ══ -->
+  <div class="page" id="page-notes">
+    <div class="section-header">
+      <span class="section-title">Workout Notes</span>
+      <button class="btn btn-primary btn-sm" onclick="openNoteModal()">+ New Note</button>
+    </div>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- ══ SETTINGS ══ -->
+  <div class="page" id="page-settings">
+    <div class="grid-2">
+      <div>
+        <div class="card section">
+          <div class="card-header"><span class="card-title">Appearance</span></div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Theme</div>
+              <div class="settings-sub">Choose your vibe</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <select class="form-input form-select" id="themeSelect" style="width:auto;" onchange="setTheme(this.value)">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="forest">Forest</option>
+                <option value="ocean">Ocean</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Accent Color</div>
+              <div class="settings-sub">Personalize your highlight color</div>
+            </div>
+            <div class="color-picker">
+              <div class="color-dot active" style="background:#c8f060;" data-color="#c8f060,#a8e040" onclick="setAccent(this,'#c8f060','#a8e040')"></div>
+              <div class="color-dot" style="background:#5cb8ff;" data-color="#5cb8ff,#3a9ce0" onclick="setAccent(this,'#5cb8ff','#3a9ce0')"></div>
+              <div class="color-dot" style="background:#b05cff;" data-color="#b05cff,#9040e0" onclick="setAccent(this,'#b05cff','#9040e0')"></div>
+              <div class="color-dot" style="background:#ff5c5c;" data-color="#ff5c5c,#e03a3a" onclick="setAccent(this,'#ff5c5c','#e03a3a')"></div>
+              <div class="color-dot" style="background:#ffaa55;" data-color="#ffaa55,#e08a30" onclick="setAccent(this,'#ffaa55','#e08a30')"></div>
+              <div class="color-dot" style="background:#ff5cb8;" data-color="#ff5cb8,#e03a98" onclick="setAccent(this,'#ff5cb8','#e03a98')"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <div class="card-header"><span class="card-title">Units</span></div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Weight Unit</div>
+              <div class="settings-sub">Used for weight-based exercises</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <span class="chip active" id="unitLbs" onclick="setUnit('lbs')">lbs</span>
+              <span class="chip" id="unitKg" onclick="setUnit('kg')">kg</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <div class="card-header"><span class="card-title">About</span></div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+            <p style="font-family:var(--font-serif);font-size:22px;color:var(--accent);font-style:italic;margin-bottom:8px;">GoodFit</p>
+            <p>Version 1.0.0 — Your personal fitness companion.</p>
+            <p style="margin-top:8px;color:var(--text3);">Data stored locally in your browser and exportable to JSON for portability across devices.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card section">
+          <div class="card-header"><span class="card-title">Data</span></div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Export Data</div>
+              <div class="settings-sub">Save all data as a portable JSON file</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Export</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Import Data</div>
+              <div class="settings-sub">Load from a previously exported file</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+          </div>
+          <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(this)">
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Clear All Data</div>
+              <div class="settings-sub">Permanently delete everything</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="clearAllData()">❌ Clear</button>
+          </div>
+        </div>
+
+        <div class="card section">
+          <div class="card-header">
+            <span class="card-title">Accounts</span>
+            <button class="btn btn-primary btn-sm" onclick="openCreateAccountModal()">+ New Account</button>
+          </div>
+          <div id="settingsAccountsList"></div>
+        </div>
+
+        <div class="card section" id="profileDataCard" style="display:none;">
+          <div class="card-header"><span class="card-title" id="profileDataTitle">Profile Data</span></div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Export This Profile</div>
+              <div class="settings-sub">Save this profile's data as JSON</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportCurrentProfileData()">⬇ Export</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Import to This Profile</div>
+              <div class="settings-sub">Load data into this profile</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importProfileFile').click()">⬆ Import</button>
+          </div>
+          <input type="file" id="importProfileFile" style="display:none;" accept=".json" onchange="importProfileData(this)">
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Clear This Profile</div>
+              <div class="settings-sub">Delete all data for this profile</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="clearCurrentProfileData()">❌ Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WELCOME ONBOARDING OVERLAY ══ -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-card">
+    <div class="welcome-logo">GoodFit</div>
+    <div class="welcome-tagline">Track · Improve · Thrive</div>
+    <div class="welcome-heading">Welcome! Let's set up your account.</div>
+    <div class="welcome-sub">Create a profile to personalise your experience and keep your data organised. You can add more accounts later.</div>
+    <div class="welcome-photo-area" id="welcomePhotoArea" onclick="document.getElementById('welcomePhotoInput').click()">
+      <span id="welcomePhotoEmoji" style="line-height:1;display:flex;align-items:center;justify-content:center;">📷</span>
+      <img id="welcomePhotoImg" style="display:none;width:100%;height:100%;object-fit:cover;" alt="profile">
+    </div>
+    <input type="file" id="welcomePhotoInput" style="display:none;" accept="image/*" onchange="handleWelcomePhoto(this)">
+    <div class="form-group" style="text-align:left;margin-bottom:20px;">
+      <label class="form-label" style="text-align:center;display:block;">Your Name</label>
+      <input type="text" class="form-input" id="welcomeNameInput" placeholder="e.g. Alex Johnson" onkeydown="if(event.key==='Enter')submitWelcomeAccount()">
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <button class="btn btn-primary" style="padding:11px 32px;font-size:14px;" onclick="submitWelcomeAccount()">Create My Account</button>
+    </div>
+    <button class="welcome-skip" onclick="dismissWelcome()">Skip for now — I'll explore first</button>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Exercise Modal -->
+<div class="modal-overlay" id="exerciseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="exerciseModalTitle">Add Exercise</span>
+      <button class="btn btn-icon" onclick="closeModal('exerciseModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Exercise Name</label>
+        <input type="text" class="form-input" id="exName" placeholder="e.g. Bench Press">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input form-select" id="exCategory">
+          <option>Strength</option>
+          <option>Cardio</option>
+          <option>Mobility</option>
+          <option>Olympic</option>
+          <option>Bodyweight</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tracking Type</label>
+        <select class="form-input form-select" id="exType" onchange="updateExUnitLabel()">
+          <option value="weight">Weight (lbs/kg)</option>
+          <option value="reps">Reps</option>
+          <option value="time">Time (seconds)</option>
+          <option value="distance">Distance (m)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input type="text" class="form-input" id="exIcon" placeholder="🏋️" maxlength="2">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Goal <span id="exUnitLabel" style="color:var(--accent)"></span></label>
+        <input type="number" class="form-input" id="exGoal" placeholder="Optional target">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('exerciseModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExercise()">Save Exercise</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log Modal (quick log from anywhere) -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Quick Log</span>
+      <button class="btn btn-icon" onclick="closeModal('logModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Exercise</label>
+        <select class="form-input form-select" id="modalLogExercise"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Value <span id="modalLogUnit" style="color:var(--accent)"></span></label>
+        <input type="number" class="form-input" id="modalLogValue" placeholder="0" step="0.5" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="modalLogDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-input" id="modalLogNotes" placeholder="Optional...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('logModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModalLog()">Log Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">New Note</span>
+      <button class="btn btn-icon" onclick="closeModal('noteModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-input" id="noteTitle" placeholder="Note title...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="noteDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Content</label>
+        <textarea class="form-input" id="noteContent" rows="5" placeholder="Write your note here..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="noteTags" placeholder="rest day, PRs, nutrition...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('noteModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Log Modal -->
+<div class="modal-overlay" id="editLogModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Entry</span>
+      <button class="btn btn-icon" onclick="closeModal('editLogModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editLogId">
+      <div class="form-group">
+        <label class="form-label">Value</label>
+        <input type="number" class="form-input" id="editLogValue" step="0.5" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="editLogDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-input" id="editLogNotes">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editLogModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditLog()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal (in-app replacement for browser confirm) -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal confirm-modal">
+    <div class="modal-body">
+      <div class="confirm-icon" id="confirmIcon">⚠️</div>
+      <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+      <div class="confirm-message" id="confirmMessage"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:center; gap:12px;">
+      <button class="btn btn-ghost" onclick="closeModal('confirmModal')" id="confirmCancelBtn">Cancel</button>
+      <button class="btn btn-danger" onclick="_confirmAction()" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Account Modal -->
+<div class="modal-overlay" id="createAccountModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Create An Account</span>
+      <button class="btn btn-icon" onclick="closeModal('createAccountModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="text-align:center;">
+        <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('accountPhotoInput').click()">
+          <span id="photoPreviewEmoji">📷</span>
+          <img id="photoPreviewImg" style="display:none;" alt="profile">
+        </div>
+        <div style="font-size:11px;color:var(--text3);">Tap to upload a photo</div>
+        <input type="file" id="accountPhotoInput" style="display:none;" accept="image/*" onchange="handlePhotoUpload(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" id="accountNameInput" placeholder="e.g. Alex Johnson">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('createAccountModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createAccount()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// MULTI-ACCOUNT DATA LAYER
+// ═══════════════════════════════════════════════
+let accounts = []; // [{id, name, photo, db}]
+let activeAccountId = null;
+
+let db = {
+  exercises: [],
+  logs: [],
+  notes: [],
+  schedule: [],
+  settings: {
+    theme: 'dark',
+    unit: 'lbs',
+    accent: '#c8f060',
+    accent2: '#a8e040'
+  }
+};
+
+function saveAccounts() {
+  try { localStorage.setItem('goodfit_accounts', JSON.stringify(accounts)); } catch(e) {}
+  try { localStorage.setItem('goodfit_activeAccount', activeAccountId || ''); } catch(e) {}
+}
+
+function loadAccounts() {
+  try {
+    const raw = localStorage.getItem('goodfit_accounts');
+    if (raw) accounts = JSON.parse(raw);
+    activeAccountId = localStorage.getItem('goodfit_activeAccount') || null;
+    // If active account exists, set db to that account's db
+    if (activeAccountId) {
+      const acct = accounts.find(a => a.id === activeAccountId);
+      if (acct) { db = acct.db; return; }
+    }
+    // Fallback: load legacy db
+    const legacy = localStorage.getItem('goodfit_db');
+    if (legacy) db = JSON.parse(legacy);
+  } catch(e) {}
+}
+
+function saveDB() {
+  if (activeAccountId) {
+    const acct = accounts.find(a => a.id === activeAccountId);
+    if (acct) { acct.db = db; saveAccounts(); return; }
+  }
+  try { localStorage.setItem('goodfit_db', JSON.stringify(db)); } catch(e) {}
+}
+
+function getExercise(id) { return db.exercises.find(e => e.id === id); }
+function getLogs(exId) { return db.logs.filter(l => l.exId === exId).sort((a,b)=>new Date(a.date)-new Date(b.date)); }
+function getAllLogs() { return db.logs.sort((a,b)=>new Date(b.date)-new Date(a.date)); }
+
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+
+function formatDate(str) {
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+}
+
+function formatValue(value, type, unit) {
+  if (type === 'weight') return `${value} ${unit||db.settings.unit}`;
+  if (type === 'reps') return `${value} reps`;
+  if (type === 'time') {
+    const m = Math.floor(value/60), s = value%60;
+    return m > 0 ? `${m}m ${s}s` : `${value}s`;
+  }
+  if (type === 'distance') return `${value} m`;
+  return `${value}`;
+}
+
+function getUnitLabel(type) {
+  if (type === 'weight') return db.settings.unit;
+  if (type === 'reps') return 'reps';
+  if (type === 'time') return 'sec';
+  if (type === 'distance') return 'm';
+  return '';
+}
+
+const EMOJIS = { Strength:'🏋️', Cardio:'🏃', Mobility:'🧘', Olympic:'🥇', Bodyweight:'💪', Other:'⚡' };
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let currentPage = 'dashboard';
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.textContent.toLowerCase().includes(id)) n.classList.add('active');
+    });
+  }
+  const titles = {dashboard:'Dashboard',exercises:'Exercises',log:'Log Workout',progress:'Progress',calendar:'Schedule',notes:'Notes',settings:'Settings'};
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+  currentPage = id;
+  closeSidebar();
+  renderPage(id);
+}
+
+function renderPage(id) {
+  if (id === 'dashboard') renderDashboard();
+  else if (id === 'exercises') renderExercises();
+  else if (id === 'log') renderLogPage();
+  else if (id === 'progress') renderProgress();
+  else if (id === 'calendar') renderCalendar();
+  else if (id === 'notes') renderNotes();
+  else if (id === 'settings') renderSettings();
+}
+
+// ═══════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type === 'error' ? 'error' : type === 'info' ? 'info' : ''}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 2800);
+}
+
+// ═══════════════════════════════════════════════
+// EXERCISE CRUD
+// ═══════════════════════════════════════════════
+let editingExId = null;
+
+function openExerciseModal(id) {
+  editingExId = id || null;
+  const ex = id ? getExercise(id) : null;
+  document.getElementById('exerciseModalTitle').textContent = id ? 'Edit Exercise' : 'Add Exercise';
+  document.getElementById('exName').value = ex ? ex.name : '';
+  document.getElementById('exCategory').value = ex ? ex.category : 'Strength';
+  document.getElementById('exType').value = ex ? ex.type : 'weight';
+  document.getElementById('exIcon').value = ex ? ex.icon : '';
+  document.getElementById('exGoal').value = ex ? (ex.goal || '') : '';
+  updateExUnitLabel();
+  openModal('exerciseModal');
+  setTimeout(()=>document.getElementById('exName').focus(), 100);
+}
+
+function updateExUnitLabel() {
+  const t = document.getElementById('exType').value;
+  document.getElementById('exUnitLabel').textContent = `(${getUnitLabel(t)})`;
+}
+
+function saveExercise() {
+  const name = document.getElementById('exName').value.trim();
+  if (!name) { toast('Please enter a name', 'error'); return; }
+  const data = {
+    name,
+    category: document.getElementById('exCategory').value,
+    type: document.getElementById('exType').value,
+    icon: document.getElementById('exIcon').value.trim() || EMOJIS[document.getElementById('exCategory').value] || '⚡',
+    goal: parseFloat(document.getElementById('exGoal').value) || null
+  };
+  if (editingExId) {
+    const ex = getExercise(editingExId);
+    Object.assign(ex, data);
+    toast('Exercise updated ✓');
+  } else {
+    db.exercises.push({ id: generateId(), ...data, createdAt: todayStr() });
+    toast('Exercise added ✓');
+  }
+  saveDB();
+  closeModal('exerciseModal');
+  renderPage(currentPage);
+}
+
+function deleteExercise(id) {
+  const ex = getExercise(id);
+  showConfirm({
+    icon: '🗑',
+    title: 'Delete Exercise?',
+    message: `This will permanently delete "${ex ? ex.name : 'this exercise'}" and all its logs. This cannot be undone.`,
+    okLabel: 'Delete',
+    onOk: () => {
+      db.exercises = db.exercises.filter(e => e.id !== id);
+      db.logs = db.logs.filter(l => l.exId !== id);
+      saveDB();
+      toast('Deleted', 'info');
+      renderPage(currentPage);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// LOG CRUD
+// ═══════════════════════════════════════════════
+function populateExerciseSelect(el, selectedId) {
+  el.innerHTML = '';
+  if (db.exercises.length === 0) {
+    el.innerHTML = '<option disabled selected>No exercises yet</option>';
+    return;
+  }
+  // Add a blank "no selection" placeholder for the log page dropdown
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'No exercise selected';
+  placeholder.disabled = true;
+  placeholder.selected = !selectedId;
+  el.appendChild(placeholder);
+
+  db.exercises.forEach(ex => {
+    const o = document.createElement('option');
+    o.value = ex.id;
+    o.textContent = `${ex.icon} ${ex.name}`;
+    if (selectedId && ex.id === selectedId) o.selected = true;
+    el.appendChild(o);
+  });
+}
+
+function submitLog() {
+  const exId = document.getElementById('logExerciseSelect').value;
+  const value = parseFloat(document.getElementById('logValue').value);
+  const date = document.getElementById('logDate').value || todayStr();
+  const notes = document.getElementById('logNotes').value.trim();
+  if (!exId || isNaN(value) || value < 0) { toast('Please fill in the value', 'error'); return; }
+  db.logs.push({ id: generateId(), exId, value, date, notes });
+  saveDB();
+  toast('Logged! 💪');
+  document.getElementById('logValue').value = '';
+  document.getElementById('logNotes').value = '';
+  renderRecentLogs();
+}
+
+function openLogModal(exId) {
+  populateExerciseSelect(document.getElementById('modalLogExercise'), exId);
+  document.getElementById('modalLogDate').value = todayStr();
+  document.getElementById('modalLogValue').value = '';
+  document.getElementById('modalLogNotes').value = '';
+  updateModalLogUnit();
+  document.getElementById('modalLogExercise').onchange = updateModalLogUnit;
+  openModal('logModal');
+}
+
+function updateModalLogUnit() {
+  const sel = document.getElementById('modalLogExercise');
+  const ex = getExercise(sel.value);
+  document.getElementById('modalLogUnit').textContent = ex ? `(${getUnitLabel(ex.type)})` : '';
+}
+
+function submitModalLog() {
+  const exId = document.getElementById('modalLogExercise').value;
+  const value = parseFloat(document.getElementById('modalLogValue').value);
+  const date = document.getElementById('modalLogDate').value || todayStr();
+  const notes = document.getElementById('modalLogNotes').value.trim();
+  if (!exId || isNaN(value) || value < 0) { toast('Please fill in the value', 'error'); return; }
+  db.logs.push({ id: generateId(), exId, value, date, notes });
+  // Track which exercise was logged so we can restore it
+  if (currentPage === 'exercises') lastSelectedExId = exId;
+  saveDB();
+  toast('Logged! 💪');
+  closeModal('logModal');
+  renderPage(currentPage);
+}
+
+function deleteLog(logId) {
+  const log = db.logs.find(l => l.id === logId);
+  showConfirm({
+    icon: '🗑',
+    title: 'Delete Entry?',
+    message: 'This log entry will be permanently deleted.',
+    okLabel: 'Delete',
+    onOk: () => {
+      if (log && currentPage === 'exercises') lastSelectedExId = log.exId;
+      db.logs = db.logs.filter(l => l.id !== logId);
+      saveDB();
+      toast('Entry deleted', 'info');
+      renderPage(currentPage);
+    }
+  });
+}
+
+function openEditLog(logId) {
+  const log = db.logs.find(l => l.id === logId);
+  if (!log) return;
+  document.getElementById('editLogId').value = logId;
+  document.getElementById('editLogValue').value = log.value;
+  document.getElementById('editLogDate').value = log.date;
+  document.getElementById('editLogNotes').value = log.notes || '';
+  openModal('editLogModal');
+}
+
+function saveEditLog() {
+  const logId = document.getElementById('editLogId').value;
+  const log = db.logs.find(l => l.id === logId);
+  if (!log) return;
+  log.value = parseFloat(document.getElementById('editLogValue').value);
+  log.date = document.getElementById('editLogDate').value;
+  log.notes = document.getElementById('editLogNotes').value.trim();
+  saveDB();
+  toast('Entry updated ✓');
+  closeModal('editLogModal');
+  renderPage(currentPage);
+}
+
+// ═══════════════════════════════════════════════
+// NOTES CRUD
+// ═══════════════════════════════════════════════
+function openNoteModal() {
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteDate').value = todayStr();
+  document.getElementById('noteContent').value = '';
+  document.getElementById('noteTags').value = '';
+  openModal('noteModal');
+  setTimeout(()=>document.getElementById('noteTitle').focus(), 100);
+}
+
+function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const content = document.getElementById('noteContent').value.trim();
+  if (!title && !content) { toast('Note is empty', 'error'); return; }
+  db.notes.unshift({
+    id: generateId(),
+    title: title || 'Untitled',
+    date: document.getElementById('noteDate').value || todayStr(),
+    content,
+    tags: document.getElementById('noteTags').value.split(',').map(t=>t.trim()).filter(Boolean)
+  });
+  saveDB();
+  toast('Note saved ✓');
+  closeModal('noteModal');
+  renderNotes();
+}
+
+function deleteNote(id) {
+  showConfirm({
+    icon: '🗑',
+    title: 'Delete Note?',
+    message: 'This note will be permanently deleted.',
+    okLabel: 'Delete',
+    onOk: () => {
+      db.notes = db.notes.filter(n => n.id !== id);
+      saveDB();
+      toast('Note deleted', 'info');
+      renderNotes();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+function setTheme(t) {
+  db.settings.theme = t;
+  document.body.dataset.theme = t;
+  saveDB();
+  // Re-apply accent after theme switch — theme CSS resets --accent via cascade
+  // so we must re-set it on the root element inline style (which wins over CSS)
+  if (db.settings.accent) {
+    document.documentElement.style.setProperty('--accent', db.settings.accent);
+    document.documentElement.style.setProperty('--accent2', db.settings.accent2 || db.settings.accent);
+    document.documentElement.style.setProperty('--accent-dim', hexToRgba(db.settings.accent, 0.12));
+    document.documentElement.style.setProperty('--accent-glow', hexToRgba(db.settings.accent, 0.25));
+    const c = db.settings.accent;
+    const r = parseInt(c.slice(1,3),16)/255;
+    const g = parseInt(c.slice(3,5),16)/255;
+    const b = parseInt(c.slice(5,7),16)/255;
+    const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+    if (t === 'light') {
+      document.documentElement.style.setProperty('--btn-text', '#ffffff');
+    } else {
+      document.documentElement.style.setProperty('--btn-text', lum > 0.4 ? '#0a0a0f' : '#f0f0f5');
+    }
+  }
+}
+
+function setAccent(el, c, c2) {
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+  db.settings.accent = c;
+  db.settings.accent2 = c2;
+  document.documentElement.style.setProperty('--accent', c);
+  document.documentElement.style.setProperty('--accent2', c2);
+  document.documentElement.style.setProperty('--accent-dim', hexToRgba(c, 0.12));
+  document.documentElement.style.setProperty('--accent-glow', hexToRgba(c, 0.25));
+  // Recalculate btn-text for any theme
+  const r = parseInt(c.slice(1,3),16)/255;
+  const g = parseInt(c.slice(3,5),16)/255;
+  const b = parseInt(c.slice(5,7),16)/255;
+  const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+  const theme = db.settings.theme || 'dark';
+  if (theme === 'light') {
+    document.documentElement.style.setProperty('--btn-text', '#ffffff');
+  } else {
+    document.documentElement.style.setProperty('--btn-text', lum > 0.4 ? '#0a0a0f' : '#f0f0f5');
+  }
+  saveDB();
+}
+
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function setUnit(u) {
+  db.settings.unit = u;
+  document.getElementById('unitLbs').classList.toggle('active', u==='lbs');
+  document.getElementById('unitKg').classList.toggle('active', u==='kg');
+  saveDB();
+  toast(`Unit set to ${u}`);
+}
+
+function exportData() {
+  const json = JSON.stringify(db, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `goodfit_backup_${todayStr()}.json`;
+  a.click();
+  toast('Data exported ✓');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.exercises || !imported.logs) throw new Error('Invalid file');
+      db = imported;
+      saveDB();
+      applySettings();
+      renderPage(currentPage);
+      toast(`Imported ${db.exercises.length} exercises, ${db.logs.length} logs ✓`);
+    } catch(err) {
+      toast('Invalid file format', 'error');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData() {
+  showConfirm({
+    icon: '⚠️',
+    title: 'Clear All Data?',
+    message: 'This will permanently delete ALL exercises, logs, and notes for every profile. This cannot be undone.',
+    okLabel: 'Clear Everything',
+    danger: true,
+    onOk: () => {
+      showConfirm({
+        icon: '⚠️',
+        title: 'Last Chance!',
+        message: 'Are you absolutely sure? All data will be wiped forever.',
+        okLabel: 'Yes, Clear All',
+        danger: true,
+        onOk: () => {
+          const freshDb = () => ({ exercises: [], logs: [], notes: [], schedule: [], settings: { theme: db.settings.theme || 'dark', unit: db.settings.unit || 'lbs', accent: '#c8f060', accent2: '#a8e040' } });
+          if (activeAccountId) {
+            accounts.forEach(a => { a.db = freshDb(); });
+            db = accounts.find(a => a.id === activeAccountId)?.db || freshDb();
+            saveAccounts();
+          } else {
+            db = freshDb();
+            saveDB();
+          }
+          toast('All data cleared', 'info');
+          renderPage(currentPage);
+        }
+      });
+    }
+  });
+}
+
+function applySettings() {
+  const s = db.settings;
+  document.body.dataset.theme = s.theme || 'dark';
+  if (s.accent) {
+    document.documentElement.style.setProperty('--accent', s.accent);
+    document.documentElement.style.setProperty('--accent2', s.accent2 || s.accent);
+    document.documentElement.style.setProperty('--accent-dim', hexToRgba(s.accent, 0.12));
+    document.documentElement.style.setProperty('--accent-glow', hexToRgba(s.accent, 0.25));
+    // Recalculate btn-text for any theme based on accent luminance
+    const accentHex = s.accent;
+    const r = parseInt(accentHex.slice(1,3),16)/255;
+    const g = parseInt(accentHex.slice(3,5),16)/255;
+    const b = parseInt(accentHex.slice(5,7),16)/255;
+    const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+    // Light theme: accents tend to be darker so need white text; others vary by luminance
+    const theme = s.theme || 'dark';
+    if (theme === 'light') {
+      document.documentElement.style.setProperty('--btn-text', '#ffffff');
+    } else {
+      document.documentElement.style.setProperty('--btn-text', lum > 0.4 ? '#0a0a0f' : '#f0f0f5');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SCHEDULE
+// ═══════════════════════════════════════════════
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYICONS = ['💪','🏃','🧘','🔥','⚡','🏋️','😴'];
+
+function toggleScheduleDay(d) {
+  const idx = db.schedule.indexOf(d);
+  if (idx === -1) db.schedule.push(d);
+  else db.schedule.splice(idx, 1);
+  saveDB();
+  renderWeekSchedule();
+  renderCalGrid(); // update the calendar's scheduled-day borders instantly
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD RENDER
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  renderStats();
+  renderRecentActivity();
+  renderWeekSummary();
+  renderHeatmap();
+  renderPRs();
+}
+
+function renderStats() {
+  const logs = db.logs;
+  const today = todayStr();
+  const todayLogs = logs.filter(l => l.date === today);
+  
+  // streak
+  let streak = 0;
+  const logDates = [...new Set(logs.map(l=>l.date))].sort().reverse();
+  const d = new Date(); d.setHours(0,0,0,0);
+  for (let i = 0; i < 365; i++) {
+    const s = d.toISOString().split('T')[0];
+    if (logDates.includes(s)) { streak++; d.setDate(d.getDate()-1); }
+    else if (i === 0) { d.setDate(d.getDate()-1); continue; }
+    else break;
+  }
+
+  // Total volume
+  const weightLogs = logs.filter(l => { const ex=getExercise(l.exId); return ex && ex.type==='weight'; });
+  const totalVol = weightLogs.reduce((s,l)=>s+l.value,0);
+
+  const stats = [
+    { label: 'Total Workouts', value: [...new Set(logs.map(l=>l.date))].length, sub: 'unique days' },
+    { label: 'Total Exercises', value: db.exercises.length, sub: `${db.logs.length} logs total` },
+    { label: 'Current Streak', value: `${streak}d`, sub: streak === 1 ? 'day' : 'days' },
+    { label: 'Total Volume', value: totalVol > 0 ? formatK(totalVol) : '—', sub: db.settings.unit }
+  ];
+
+  document.getElementById('statsGrid').innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('streakBadge').textContent = `${streak}d streak`;
+}
+
+function formatK(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
+  return n.toFixed(0);
+}
+
+function renderRecentActivity() {
+  const all = getAllLogs().slice(0, 8);
+  const el = document.getElementById('recentActivity');
+  if (all.length === 0) { el.innerHTML = '<div class="empty-state" style="padding:30px 0;"><div class="empty-icon">📋</div><div class="empty-title">No activity yet</div><div class="empty-sub">Start logging your workouts!</div></div>'; return; }
+  el.innerHTML = all.map(log => {
+    const ex = getExercise(log.exId);
+    if (!ex) return '';
+    return `<div class="log-entry">
+      <span style="font-size:20px;">${ex.icon}</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;">${ex.name}</div>
+        <div style="font-size:11px;color:var(--text3);">${formatDate(log.date)}</div>
+      </div>
+      <div style="margin-left:auto;font-family:var(--font-head);font-size:16px;font-weight:700;color:var(--accent);">${formatValue(log.value, ex.type)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeekSummary() {
+  const el = document.getElementById('weekSummary');
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay()+6)%7));
+  monday.setHours(0,0,0,0);
+
+  const weekDays = DAYS.map((name, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    const dayLogs = db.logs.filter(l => l.date === dateStr);
+    const isScheduled = db.schedule.includes(name);
+    const isPast = d <= now;
+    const isToday = dateStr === todayStr();
+    return { name, dateStr, logs: dayLogs, isScheduled, isPast, isToday };
+  });
+
+  el.innerHTML = weekDays.map(d => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="width:36px;font-size:10px;color:${d.isToday?'var(--accent)':'var(--text3)'};font-weight:${d.isToday?700:400};">${d.name}</div>
+      <div style="flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${d.logs.length>0?'100%':'0'};background:var(--accent);border-radius:3px;transition:width 0.4s;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);min-width:60px;text-align:right;">
+        ${d.logs.length > 0 ? `<span style="color:var(--accent);">${d.logs.length} ${d.logs.length===1?'entry':'entries'}</span>` : d.isScheduled && d.isPast ? '<span style="color:var(--red);font-size:10px;">missed</span>' : d.isScheduled ? '<span style="color:var(--text3);font-size:10px;">planned</span>' : '—'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap() {
+  const el = document.getElementById('heatmapGrid');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(today);
+  start.setDate(today.getDate() - 181);
+  // align to Monday
+  while (start.getDay() !== 1) start.setDate(start.getDate() - 1);
+
+  const logDayMap = {};
+  db.logs.forEach(l => { logDayMap[l.date] = (logDayMap[l.date] || 0) + 1; });
+
+  const rgb = hexToRgbComponents(db.settings.accent || '#c8f060');
+  let html = '';
+  const cur = new Date(start);
+  while (cur <= today) {
+    const s = cur.toISOString().split('T')[0];
+    const count = logDayMap[s] || 0;
+    const opacity = count === 0 ? 0 : count <= 2 ? 0.3 : count <= 4 ? 0.6 : 1;
+    const bg = count === 0 ? 'var(--bg4)' : `rgba(${rgb},${opacity})`;
+    html += `<div class="heatmap-cell" style="background:${bg};" title="${s}: ${count} entries"></div>`;
+    cur.setDate(cur.getDate()+1);
+  }
+  el.innerHTML = html;
+
+  // Update legend swatches to match current accent
+  const leg1 = document.getElementById('heatLeg1');
+  const leg2 = document.getElementById('heatLeg2');
+  if (leg1) leg1.style.background = `rgba(${rgb},0.3)`;
+  if (leg2) leg2.style.background = `rgba(${rgb},0.6)`;
+}
+
+function hexToRgbComponents(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function renderPRs() {
+  const el = document.getElementById('prGrid');
+  if (db.exercises.length === 0) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;grid-column:1/-1;">Add exercises to see your PRs here.</div>'; return; }
+  const top = db.exercises.slice(0,6);
+  el.innerHTML = top.map(ex => {
+    const logs = getLogs(ex.id);
+    if (logs.length === 0) return `<div class="card" style="text-align:center;"><div style="font-size:28px;">${ex.icon}</div><div style="font-family:var(--font-head);font-size:13px;margin-top:6px;">${ex.name}</div><div style="color:var(--text3);font-size:11px;margin-top:4px;">No logs</div></div>`;
+    const pr = Math.max(...logs.map(l=>l.value));
+    const last = logs[logs.length-1].value;
+    const prev = logs.length > 1 ? logs[logs.length-2].value : null;
+    const diff = prev !== null ? ((last-prev)/prev*100).toFixed(1) : null;
+    return `<div class="card" style="text-align:center;cursor:pointer;" onclick="showPage('progress',null);setTimeout(()=>{selectProgressExercise('${ex.id}')},100);">
+      <div style="font-size:28px;">${ex.icon}</div>
+      <div style="font-family:var(--font-head);font-size:13px;margin-top:6px;">${ex.name}</div>
+      <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--accent);margin-top:4px;">${formatValue(pr, ex.type)}</div>
+      <div class="pr-chip" style="margin-top:6px;">🏆 PR</div>
+      ${diff !== null ? `<div class="improvement-chip ${diff >= 0 ? 'positive' : 'negative'}" style="margin-top:6px;">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}%</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// EXERCISES RENDER
+// ═══════════════════════════════════════════════
+let lastSelectedExId = null;
+
+function renderExercises() {
+  const el = document.getElementById('exerciseList');
+  if (db.exercises.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏋️</div><div class="empty-title">No exercises yet</div><div class="empty-sub">Add your first exercise to get started</div><br><button class="btn btn-primary" onclick="openExerciseModal()">+ Add Exercise</button></div>`;
+    // Clear detail panel too
+    document.getElementById('exerciseDetailPanel').innerHTML = `<div class="empty-state"><div class="empty-icon">🏋️</div><div class="empty-title">Select an exercise</div><div class="empty-sub">Click any exercise to view details and history</div></div>`;
+    lastSelectedExId = null;
+    return;
+  }
+  el.innerHTML = db.exercises.map(ex => {
+    const logs = getLogs(ex.id);
+    const pr = logs.length ? Math.max(...logs.map(l=>l.value)) : null;
+    const isSelected = ex.id === lastSelectedExId;
+    return `<div class="exercise-item${isSelected ? ' selected' : ''}" onclick="showExerciseDetail('${ex.id}')">
+      <div class="exercise-icon">${ex.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-meta">${ex.category} · ${ex.type} · ${logs.length} logs</div>
+      </div>
+      <div class="exercise-badge">
+        ${pr !== null ? `<div style="font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--accent);">${formatValue(pr, ex.type)}</div>` : '<span class="tag">No data</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Restore last selected exercise detail panel
+  if (lastSelectedExId && getExercise(lastSelectedExId)) {
+    showExerciseDetail(lastSelectedExId, true);
+  }
+}
+
+function showExerciseDetail(id, silent) {
+  lastSelectedExId = id;
+  const ex = getExercise(id);
+  if (!ex) return;
+  const logs = getLogs(id);
+  const panel = document.getElementById('exerciseDetailPanel');
+
+  const pr = logs.length ? Math.max(...logs.map(l=>l.value)) : null;
+  const last = logs.length ? logs[logs.length-1].value : null;
+  const avg = logs.length ? (logs.reduce((s,l)=>s+l.value,0)/logs.length).toFixed(1) : null;
+
+  panel.innerHTML = `<div class="card">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="exercise-icon" style="width:52px;height:52px;font-size:26px;">${ex.icon}</div>
+      <div>
+        <div style="font-family:var(--font-head);font-size:20px;font-weight:700;">${ex.name}</div>
+        <div style="font-size:12px;color:var(--text3);">${ex.category} · ${ex.type}</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="openExerciseModal('${id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteExercise('${id}')">❌ Delete</button>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-label">PR</div><div class="stat-value" style="font-size:20px;">${pr!==null?formatValue(pr,ex.type):'—'}</div></div>
+      <div class="stat-card"><div class="stat-label">Last</div><div class="stat-value" style="font-size:20px;">${last!==null?formatValue(last,ex.type):'—'}</div></div>
+      <div class="stat-card"><div class="stat-label">Avg</div><div class="stat-value" style="font-size:20px;">${avg!==null?formatValue(parseFloat(avg),ex.type):'—'}</div></div>
+    </div>
+    <div style="height:180px;margin-bottom:18px;"><canvas id="exDetailChart"></canvas></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-family:var(--font-head);font-size:14px;font-weight:700;">History</div>
+      <button class="btn btn-primary btn-sm" onclick="openLogModal('${id}')">+ Log</button>
+    </div>
+    <div style="max-height:220px;overflow-y:auto;">
+      ${logs.length === 0 ? '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px;">No logs yet</div>' :
+        [...logs].reverse().map(l => `<div class="log-entry">
+          <div class="log-date">${formatDate(l.date)}</div>
+          <div class="log-value">${formatValue(l.value, ex.type)}</div>
+          <div class="log-notes">${l.notes||''}</div>
+          <div class="log-actions">
+            <button class="btn btn-icon" style="padding:5px;font-size:12px;" onclick="openEditLog('${l.id}')">✏️</button>
+            <button class="btn btn-icon" style="padding:5px;font-size:12px;" onclick="deleteLog('${l.id}')">❌</button>
+          </div>
+        </div>`).join('')
+      }
+    </div>
+  </div>`;
+
+  // mini chart
+  if (logs.length > 0) {
+    const ctx = document.getElementById('exDetailChart');
+    if (ctx) {
+      if (ctx._chartInst) ctx._chartInst.destroy();
+      ctx._chartInst = new Chart(ctx, buildLineConfig(
+        logs.map(l=>l.date),
+        logs.map(l=>l.value),
+        getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+        true
+      ));
+    }
+  }
+
+  // highlight selected
+  document.querySelectorAll('.exercise-item').forEach(i => i.classList.remove('selected'));
+  document.querySelectorAll('.exercise-item').forEach(i => {
+    if (i.getAttribute('onclick') && i.getAttribute('onclick').includes(`'${id}'`)) {
+      i.classList.add('selected');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// LOG PAGE
+// ═══════════════════════════════════════════════
+function renderLogPage() {
+  populateExerciseSelect(document.getElementById('logExerciseSelect'));
+  document.getElementById('logDate').value = todayStr();
+  updateLogUnitDisplay();
+  document.getElementById('logExerciseSelect').onchange = updateLogUnitDisplay;
+  populateExerciseSelect(document.getElementById('recentLogsFilter'));
+  renderRecentLogs();
+}
+
+function updateLogUnitDisplay() {
+  const ex = getExercise(document.getElementById('logExerciseSelect').value);
+  document.getElementById('logUnitDisplay').textContent = ex ? getUnitLabel(ex.type) : '';
+}
+
+function renderRecentLogs() {
+  const exId = document.getElementById('recentLogsFilter').value;
+  const logs = exId ? db.logs.filter(l=>l.exId===exId) : db.logs;
+  const sorted = [...logs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+  const el = document.getElementById('recentLogsList');
+  if (sorted.length === 0) { el.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:13px;">No logs yet</div>'; return; }
+  el.innerHTML = sorted.map(l => {
+    const ex = getExercise(l.exId);
+    if (!ex) return '';
+    return `<div class="log-entry">
+      <span style="font-size:18px;">${ex.icon}</span>
+      <div class="log-date">${formatDate(l.date)}</div>
+      <div class="log-value" style="font-size:14px;">${formatValue(l.value, ex.type)}</div>
+      <div class="log-notes" style="font-size:11px;">${ex.name}${l.notes?' · '+l.notes:''}</div>
+      <div class="log-actions">
+        <button class="btn btn-icon" style="padding:5px;font-size:11px;" onclick="openEditLog('${l.id}')">✏️</button>
+        <button class="btn btn-icon" style="padding:5px;font-size:11px;" onclick="deleteLog('${l.id}')">❌</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS CHARTS
+// ═══════════════════════════════════════════════
+let progressChartInst = null;
+let compareChartInst = null;
+let selectedRange = '1m';
+let selectedChartType = 'line';
+let lastSelectedProgressExId = null;
+
+function setRange(el, r) {
+  selectedRange = r;
+  document.querySelectorAll('[data-range]').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  renderProgressChart();
+}
+
+function setChartType(el, t) {
+  selectedChartType = t;
+  document.querySelectorAll('[data-chart]').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  renderProgressChart();
+}
+
+function selectProgressExercise(id) {
+  lastSelectedProgressExId = id;
+  const sel = document.getElementById('progressExerciseSelect');
+  if (sel) { sel.value = id; renderProgressChart(); }
+}
+
+function renderProgress() {
+  const sel = document.getElementById('progressExerciseSelect');
+  populateExerciseSelect(sel, lastSelectedProgressExId || undefined);
+  // If we had a last selection and it still exists, restore it
+  if (lastSelectedProgressExId && getExercise(lastSelectedProgressExId)) {
+    sel.value = lastSelectedProgressExId;
+  } else if (db.exercises.length > 0) {
+    // Default to first exercise, save it
+    lastSelectedProgressExId = sel.value || db.exercises[0].id;
+    sel.value = lastSelectedProgressExId;
+  }
+  sel.onchange = () => {
+    lastSelectedProgressExId = sel.value;
+    renderProgressChart();
+  };
+  renderProgressChart();
+  renderCompareChart();
+}
+
+function filterByRange(logs) {
+  if (selectedRange === 'all') return logs;
+  const now = new Date();
+  const map = {'1m':30,'3m':90,'6m':180,'1y':365};
+  const days = map[selectedRange] || 30;
+  const cutoff = new Date(now);
+  cutoff.setDate(now.getDate() - days);
+  return logs.filter(l => new Date(l.date+'T12:00:00') >= cutoff);
+}
+
+function buildLineConfig(labels, data, color, mini=false) {
+  const accentRGB = hexToRgbComponents(db.settings.accent);
+  return {
+    type: mini ? 'line' : selectedChartType === 'scatter' ? 'scatter' : selectedChartType,
+    data: {
+      labels: selectedChartType === 'scatter' ? undefined : labels,
+      datasets: [{
+        label: 'Value',
+        data: selectedChartType === 'scatter' ? labels.map((l,i)=>({x:i, y:data[i]})) : data,
+        borderColor: color,
+        backgroundColor: `rgba(${accentRGB},0.15)`,
+        borderWidth: 2.5,
+        pointRadius: data.length > 40 ? 2 : 4,
+        pointHoverRadius: 6,
+        tension: 0.35,
+        fill: selectedChartType !== 'scatter' && !mini ? 'origin' : false,
+        pointBackgroundColor: color,
+        pointBorderColor: 'transparent'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,20,0.9)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0f0f5',
+          bodyColor: color,
+          padding: 10
+        }
+      },
+      scales: mini ? {
+        x: { display: false },
+        y: { display: false }
+      } : {
+        x: {
+          ticks: { color: '#606075', font: { family: 'DM Mono', size: 10 }, maxRotation: 45 },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          ticks: { color: '#606075', font: { family: 'DM Mono', size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  };
+}
+
+function renderProgressChart() {
+  const exId = document.getElementById('progressExerciseSelect').value;
+  const ex = getExercise(exId);
+  const canvas = document.getElementById('progressChart');
+  const wrap = canvas ? canvas.parentElement : null;
+  if (!canvas) return;
+  if (progressChartInst) { progressChartInst.destroy(); progressChartInst = null; }
+
+  // Show empty state if no exercises exist or none selected
+  const emptyId = 'progressChartEmpty';
+  let emptyEl = document.getElementById(emptyId);
+  if (!emptyEl) {
+    emptyEl = document.createElement('div');
+    emptyEl.id = emptyId;
+    emptyEl.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);font-size:13px;gap:8px;pointer-events:none;';
+    wrap.style.position = 'relative';
+    wrap.appendChild(emptyEl);
+  }
+
+  if (!ex || db.exercises.length === 0) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = '<div style="font-size:32px;">📈</div><div style="font-family:var(--font-head);font-size:15px;color:var(--text2);">No exercises yet</div><div>Add exercises to start tracking progress</div>';
+    renderProgressStats([], null);
+    return;
+  }
+
+  const allLogs = getLogs(exId);
+  const logs = filterByRange(allLogs);
+
+  if (logs.length === 0) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = '<div style="font-size:32px;">📋</div><div style="font-family:var(--font-head);font-size:15px;color:var(--text2);">No data in this range</div><div>Try a wider time range or log some entries</div>';
+    renderProgressStats([], ex);
+    return;
+  }
+
+  canvas.style.display = '';
+  emptyEl.style.display = 'none';
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#c8f060';
+  const labels = logs.map(l => formatDate(l.date));
+  const data = logs.map(l => l.value);
+
+  const cfg = buildLineConfig(labels, data, accent);
+  if (selectedChartType === 'bar') {
+    cfg.data.datasets[0].backgroundColor = `rgba(${hexToRgbComponents(accent)},0.6)`;
+    cfg.data.datasets[0].borderRadius = 4;
+  }
+
+  progressChartInst = new Chart(canvas, cfg);
+  renderProgressStats(logs, ex);
+}
+
+function renderProgressStats(logs, ex) {
+  const el = document.getElementById('progressStats');
+  if (!logs || logs.length === 0) { el.innerHTML = ''; return; }
+  const vals = logs.map(l=>l.value);
+  const pr = Math.max(...vals);
+  const first = vals[0], last = vals[vals.length-1];
+  const change = first !== 0 ? ((last-first)/first*100).toFixed(1) : 0;
+  const avg = (vals.reduce((s,v)=>s+v,0)/vals.length).toFixed(1);
+
+  el.innerHTML = [
+    { label:'PR (Period)', value: formatValue(pr, ex.type) },
+    { label:'Avg', value: formatValue(parseFloat(avg), ex.type) },
+    { label:'Total Change', value: `${change >= 0?'+':''}${change}%`, sub: `${formatValue(first,ex.type)} → ${formatValue(last,ex.type)}` },
+    { label:'Sessions', value: logs.length, sub: 'entries' }
+  ].map(s => `<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value" style="font-size:20px;">${s.value}</div>${s.sub?`<div class="stat-sub">${s.sub}</div>`:''}</div>`).join('');
+}
+
+function renderCompareChart() {
+  const canvas = document.getElementById('compareChart');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  if (compareChartInst) { compareChartInst.destroy(); compareChartInst = null; }
+
+  const emptyId = 'compareChartEmpty';
+  let emptyEl = document.getElementById(emptyId);
+  if (!emptyEl) {
+    emptyEl = document.createElement('div');
+    emptyEl.id = emptyId;
+    emptyEl.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);font-size:13px;gap:8px;pointer-events:none;';
+    wrap.style.position = 'relative';
+    wrap.appendChild(emptyEl);
+  }
+
+  if (db.exercises.length === 0) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = '<div style="font-size:28px;">📊</div><div style="font-family:var(--font-head);font-size:14px;color:var(--text2);">No exercises to compare</div><div>Add at least two exercises with data</div>';
+    return;
+  }
+
+  const colors = ['#c8f060','#5cb8ff','#b05cff','#ff5c5c','#ffaa55','#ff5cb8'];
+  const exes = db.exercises.slice(0, 6);
+
+  const datasets = exes.map((ex, i) => {
+    const logs = filterByRange(getLogs(ex.id));
+    if (logs.length < 2) return null;
+    const base = logs[0].value || 1;
+    return {
+      label: ex.name,
+      data: logs.map(l => ({ x: l.date, y: ((l.value/base)*100).toFixed(1) })),
+      borderColor: colors[i % colors.length],
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      pointRadius: 2,
+      tension: 0.3
+    };
+  }).filter(Boolean);
+
+  if (datasets.length === 0) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    emptyEl.innerHTML = '<div style="font-size:28px;">📊</div><div style="font-family:var(--font-head);font-size:14px;color:var(--text2);">Not enough data yet</div><div>Log at least 2 sessions per exercise to compare</div>';
+    return;
+  }
+
+  canvas.style.display = '';
+  emptyEl.style.display = 'none';
+
+  compareChartInst = new Chart(canvas, {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#a0a0b5', font: { family: 'DM Mono', size: 10 }, boxWidth: 12, padding: 10 }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,20,0.9)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0f0f5',
+          bodyColor: '#f0f0f5',
+          padding: 10
+        }
+      },
+      scales: {
+        x: { type: 'category', ticks: { color: '#606075', font: { family: 'DM Mono', size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#606075', font: { family: 'DM Mono', size: 10 }, callback: v => `${v}%` }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════
+let calYear, calMonth;
+
+function renderCalendar() {
+  if (!calYear) { const now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); }
+  renderCalGrid();
+  renderWeekSchedule();
+}
+
+function calNav(dir) { calMonth += dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalGrid(); }
+function calGoToday() { const now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); renderCalGrid(); }
+
+function renderCalGrid() {
+  const el = document.getElementById('calGrid');
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthTitle').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  const logDates = new Set(db.logs.map(l=>l.date));
+  const today = todayStr();
+
+  const first = new Date(calYear, calMonth, 1);
+  const last = new Date(calYear, calMonth+1, 0);
+  let startDay = (first.getDay()+6)%7; // Monday start
+
+  let html = ['M','T','W','T','F','S','S'].map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  for(let i=0;i<startDay;i++) html += '<div class="cal-day empty"></div>';
+
+  for(let d=1;d<=last.getDate();d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasW = logDates.has(dateStr);
+    const isToday = dateStr === today;
+    const dayOfWeek = new Date(calYear,calMonth,d).getDay();
+    const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dayOfWeek];
+    const isScheduled = db.schedule.includes(dayName);
+    html += `<div class="cal-day ${isToday?'today':''} ${hasW?'has-workout':''} ${isScheduled?'scheduled':''}"
+      onclick="showCalDay('${dateStr}')" title="${dateStr}">${d}</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderWeekSchedule() {
+  const el = document.getElementById('weekScheduleGrid');
+  el.innerHTML = DAYS.map((d,i) => {
+    const active = db.schedule.includes(d);
+    return `<div class="day-toggle ${active?'active':''}" onclick="toggleScheduleDay('${d}')">
+      <div class="day-icon">${DAYICONS[i]}</div>
+      <div class="day-name">${d}</div>
+    </div>`;
+  }).join('');
+}
+
+function showCalDay(dateStr) {
+  const el = document.getElementById('calDayDetail');
+  const dayLogs = db.logs.filter(l=>l.date===dateStr);
+  const d = new Date(dateStr+'T12:00:00');
+  const formatted = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+
+  el.innerHTML = `<div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div class="card-title">${formatted}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;">${dayLogs.length} ${dayLogs.length===1?'entry':'entries'}</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openLogModalDate('${dateStr}')">+ Log</button>
+  </div>
+  ${dayLogs.length === 0 ? '<div style="color:var(--text3);font-size:13px;">No workouts logged this day.</div>' :
+    dayLogs.map(l => {
+      const ex = getExercise(l.exId);
+      if (!ex) return '';
+      return `<div class="log-entry" style="padding:10px 0;">
+        <span style="font-size:18px;">${ex.icon}</span>
+        <div>${ex.name}</div>
+        <div style="margin-left:auto;font-family:var(--font-head);color:var(--accent);font-weight:700;">${formatValue(l.value,ex.type)}</div>
+      </div>`;
+    }).join('')
+  }`;
+}
+
+function openLogModalDate(dateStr) {
+  openLogModal();
+  setTimeout(()=>{ document.getElementById('modalLogDate').value = dateStr; }, 50);
+}
+
+// ═══════════════════════════════════════════════
+// NOTES
+// ═══════════════════════════════════════════════
+function renderNotes() {
+  const el = document.getElementById('notesList');
+  if (db.notes.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">No notes yet</div><div class="empty-sub">Keep track of how you're feeling, your nutrition, or anything else</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="grid-2">${db.notes.map(n => `
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <div>
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:600;">${escHtml(n.title)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px;">${formatDate(n.date)}</div>
+        </div>
+        <button class="btn btn-icon" style="padding:6px;font-size:12px;flex-shrink:0;" onclick="deleteNote('${n.id}')">❌</button>
+      </div>
+      ${n.content ? `<div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;">${escHtml(n.content)}</div>` : ''}
+      ${n.tags && n.tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">${n.tags.map(t=>`<span class="tag accent">${escHtml(t)}</span>`).join('')}</div>` : ''}
+    </div>
+  `).join('')}</div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS RENDER
+// ═══════════════════════════════════════════════
+function renderSettings() {
+  const s = db.settings;
+  document.getElementById('themeSelect').value = s.theme || 'dark';
+  document.getElementById('unitLbs').classList.toggle('active', s.unit !== 'kg');
+  document.getElementById('unitKg').classList.toggle('active', s.unit === 'kg');
+  document.querySelectorAll('.color-dot').forEach(d => {
+    d.classList.toggle('active', d.style.background === s.accent || d.dataset.color && d.dataset.color.startsWith(s.accent));
+  });
+  renderSettingsAccounts();
+  // Show/hide profile-specific data card
+  const hasActive = !!activeAccountId;
+  const pdCard = document.getElementById('profileDataCard');
+  if (pdCard) {
+    pdCard.style.display = hasActive ? '' : 'none';
+    if (hasActive) {
+      const acct = accounts.find(a => a.id === activeAccountId);
+      document.getElementById('profileDataTitle').textContent = acct ? `${acct.name}'s Data` : 'Profile Data';
+    }
+  }
+}
+
+function renderSettingsAccounts() {
+  const el = document.getElementById('settingsAccountsList');
+  if (!el) return;
+  if (accounts.length === 0) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:12px 0;">No accounts yet. Create one below!</div>`;
+    return;
+  }
+  el.innerHTML = accounts.map(a => {
+    const isActive = a.id === activeAccountId;
+    const avatarHtml = a.photo
+      ? `<div class="account-item-avatar"><img src="${a.photo}" alt="${a.name}"></div>`
+      : `<div class="account-item-avatar" style="background:var(--accent-dim);color:var(--accent);font-family:var(--font-head);font-weight:700;font-size:16px;">${a.name.charAt(0).toUpperCase()}</div>`;
+    return `<div class="account-item">
+      ${avatarHtml}
+      <div style="flex:1;">
+        <div style="font-family:var(--font-head);font-size:14px;font-weight:600;">${escHtml(a.name)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${a.db.exercises.length} exercises · ${a.db.logs.length} logs</div>
+      </div>
+      ${isActive ? '<span class="badge" style="margin-right:8px;">Active</span>' : `<button class="btn btn-ghost btn-sm" style="margin-right:8px;" onclick="switchAccount('${a.id}')">Switch</button>`}
+      <button class="btn btn-icon" style="padding:6px;font-size:13px;" onclick="deleteAccount('${a.id}')">❌</button>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// SEED DATA (demo)
+// ═══════════════════════════════════════════════
+function seedDemoData() {
+  if (db.exercises.length > 0) return;
+  const exercises = [
+    { id:'ex1', name:'Bench Press', category:'Strength', type:'weight', icon:'🏋️', goal: 100, createdAt:'2024-09-01' },
+    { id:'ex2', name:'Squat', category:'Strength', type:'weight', icon:'💪', goal: 140, createdAt:'2024-09-01' },
+    { id:'ex3', name:'Deadlift', category:'Strength', type:'weight', icon:'🔥', goal: 160, createdAt:'2024-09-01' },
+    { id:'ex4', name:'5km Run', category:'Cardio', type:'time', icon:'🏃', goal: null, createdAt:'2024-09-01' },
+  ];
+  db.exercises = exercises;
+  db.schedule = ['Mon','Wed','Fri'];
+
+  // Generate historical logs
+  const startDate = new Date(); startDate.setDate(startDate.getDate()-90);
+  for (let i=0;i<90;i++) {
+    const d = new Date(startDate); d.setDate(startDate.getDate()+i);
+    const dow = d.getDay();
+    if ([1,3,5].includes(dow)) { // Mon, Wed, Fri
+      const dateStr = d.toISOString().split('T')[0];
+      const prog = i/90;
+      exercises.forEach((ex,ei) => {
+        if (ei === 3 && Math.random() < 0.5) return; // run sometimes
+        let base;
+        if (ex.type==='weight') base = [60,80,100,null][ei] * (1 + prog*0.25) + (Math.random()-0.4)*5;
+        else base = 1500 - prog*200 + (Math.random()-0.5)*60;
+        db.logs.push({ id: generateId(), exId: ex.id, value: Math.round(base*2)/2, date: dateStr, notes: '' });
+      });
+    }
+  }
+  db.notes.push({ id: generateId(), title: 'Starting out!', date: '2024-09-01', content: 'First day tracking with GoodFit. Feeling motivated!', tags: ['motivation','start'] });
+  saveDB();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+(function init() {
+  loadAccounts();
+  seedDemoData();
+  applySettings();
+  renderDashboard();
+  renderSidebarProfile();
+  // Show welcome overlay on first load if no accounts exist
+  if (accounts.length === 0) {
+    setTimeout(() => {
+      document.getElementById('welcomeOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('welcomeNameInput').focus(), 400);
+    }, 300);
+  }
+})();
+
+// ═══════════════════════════════════════════════
+// WELCOME OVERLAY
+// ═══════════════════════════════════════════════
+let _welcomePhotoData = null;
+
+function handleWelcomePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _welcomePhotoData = e.target.result;
+    document.getElementById('welcomePhotoEmoji').style.display = 'none';
+    const img = document.getElementById('welcomePhotoImg');
+    img.src = _welcomePhotoData;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitWelcomeAccount() {
+  const name = document.getElementById('welcomeNameInput').value.trim();
+  if (!name) {
+    document.getElementById('welcomeNameInput').focus();
+    document.getElementById('welcomeNameInput').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('welcomeNameInput').style.borderColor = '', 1200);
+    return;
+  }
+  const id = generateId();
+  const newDb = {
+    exercises: [],
+    logs: [],
+    notes: [],
+    schedule: [],
+    settings: { theme: db.settings.theme || 'dark', unit: db.settings.unit || 'lbs', accent: db.settings.accent || '#c8f060', accent2: db.settings.accent2 || '#a8e040' }
+  };
+  const account = { id, name, photo: _welcomePhotoData || null, db: newDb };
+  accounts.push(account);
+  activeAccountId = id;
+  db = newDb;
+  saveAccounts();
+  dismissWelcome();
+  renderSidebarProfile();
+  renderPage(currentPage);
+  if (currentPage === 'settings') renderSettings();
+  toast(`Welcome to GoodFit, ${name}! 🎉`);
+}
+
+function dismissWelcome() {
+  const overlay = document.getElementById('welcomeOverlay');
+  overlay.classList.remove('open');
+  _welcomePhotoData = null;
+}
+
+// ═══════════════════════════════════════════════
+// IN-APP CONFIRM MODAL
+// ═══════════════════════════════════════════════
+let _pendingConfirmAction = null;
+
+function showConfirm({ icon='⚠️', title='Are you sure?', message='', okLabel='Confirm', danger=true, onOk }) {
+  _pendingConfirmAction = onOk;
+  document.getElementById('confirmIcon').textContent = icon;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  const okBtn = document.getElementById('confirmOkBtn');
+  okBtn.textContent = okLabel;
+  okBtn.className = danger ? 'btn btn-danger' : 'btn btn-primary';
+  openModal('confirmModal');
+}
+
+function _confirmAction() {
+  closeModal('confirmModal');
+  if (typeof _pendingConfirmAction === 'function') {
+    _pendingConfirmAction();
+    _pendingConfirmAction = null;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ACCOUNT MANAGEMENT
+// ═══════════════════════════════════════════════
+let _pendingPhotoData = null;
+
+function openCreateAccountModal() {
+  _pendingPhotoData = null;
+  document.getElementById('accountNameInput').value = '';
+  document.getElementById('photoPreviewEmoji').style.display = '';
+  document.getElementById('photoPreviewImg').style.display = 'none';
+  document.getElementById('photoPreviewImg').src = '';
+  openModal('createAccountModal');
+  setTimeout(() => document.getElementById('accountNameInput').focus(), 100);
+}
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _pendingPhotoData = e.target.result;
+    document.getElementById('photoPreviewEmoji').style.display = 'none';
+    const img = document.getElementById('photoPreviewImg');
+    img.src = _pendingPhotoData;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function createAccount() {
+  const name = document.getElementById('accountNameInput').value.trim();
+  if (!name) { toast('Please enter a name', 'error'); return; }
+  const id = generateId();
+  const newDb = {
+    exercises: [],
+    logs: [],
+    notes: [],
+    schedule: [],
+    settings: { theme: db.settings.theme || 'dark', unit: db.settings.unit || 'lbs', accent: db.settings.accent || '#c8f060', accent2: db.settings.accent2 || '#a8e040' }
+  };
+  const account = { id, name, photo: _pendingPhotoData || null, db: newDb };
+  accounts.push(account);
+  switchAccount(id);
+  saveAccounts();
+  closeModal('createAccountModal');
+  toast(`Welcome, ${name}! 👋`);
+  renderSidebarProfile();
+  if (currentPage === 'settings') renderSettings();
+}
+
+function switchAccount(id) {
+  const acct = accounts.find(a => a.id === id);
+  if (!acct) return;
+  activeAccountId = id;
+  db = acct.db;
+  saveAccounts();
+  applySettings();
+  renderSidebarProfile();
+  renderPage(currentPage);
+  closeProfileDropdown();
+  toast(`Switched to ${acct.name}`);
+  if (currentPage === 'settings') renderSettings();
+}
+
+function deleteAccount(id) {
+  const acct = accounts.find(a => a.id === id);
+  if (!acct) return;
+  showConfirm({
+    icon: '🗑',
+    title: `Delete "${acct.name}"?`,
+    message: 'This will permanently delete this account and all its data. This cannot be undone.',
+    okLabel: 'Delete Account',
+    danger: true,
+    onOk: () => {
+      accounts = accounts.filter(a => a.id !== id);
+      if (activeAccountId === id) {
+        if (accounts.length > 0) {
+          activeAccountId = accounts[0].id;
+          db = accounts[0].db;
+        } else {
+          activeAccountId = null;
+          db = { exercises: [], logs: [], notes: [], schedule: [], settings: { theme: 'dark', unit: 'lbs', accent: '#c8f060', accent2: '#a8e040' } };
+        }
+      }
+      saveAccounts();
+      applySettings();
+      renderSidebarProfile();
+      renderPage(currentPage);
+      if (currentPage === 'settings') renderSettings();
+      toast('Account deleted', 'info');
+    }
+  });
+}
+
+function renderSidebarProfile() {
+  const profileBox = document.getElementById('profileBox');
+  const createBtn = document.getElementById('createAccountFooterBtn');
+  const hasAccounts = accounts.length > 0;
+
+  // Toggle: profile box when accounts exist, Create Account button when not
+  if (profileBox) profileBox.style.display = hasAccounts ? '' : 'none';
+  if (createBtn) createBtn.style.display = hasAccounts ? 'none' : '';
+
+  if (!hasAccounts) return;
+
+  const acct = activeAccountId ? accounts.find(a => a.id === activeAccountId) : accounts[0];
+  if (!acct) return;
+
+  const nameEl = document.getElementById('sidebarProfileName');
+  const avatarEl = document.getElementById('sidebarAvatar');
+
+  if (nameEl) nameEl.textContent = acct.name;
+  if (avatarEl) {
+    if (acct.photo) {
+      avatarEl.innerHTML = `<img src="${acct.photo}" alt="${acct.name}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+      avatarEl.innerHTML = `<span style="font-size:11px;font-family:var(--font-head);font-weight:700;color:var(--accent);">${acct.name.charAt(0).toUpperCase()}</span>`;
+    }
+  }
+  renderProfileSwitchList();
+}
+
+function renderProfileSwitchList() {
+  const el = document.getElementById('profileSwitchList');
+  if (accounts.length === 0) {
+    el.innerHTML = `<div style="padding:12px 14px;font-size:12px;color:var(--text3);">No accounts yet</div>`;
+    return;
+  }
+  el.innerHTML = accounts.map(a => {
+    const isActive = a.id === activeAccountId;
+    const avatarHtml = a.photo
+      ? `<div class="pd-avatar"><img src="${a.photo}" alt="${a.name}"></div>`
+      : `<div class="pd-avatar" style="background:var(--accent-dim);color:var(--accent);font-family:var(--font-head);font-weight:700;">${a.name.charAt(0).toUpperCase()}</div>`;
+    return `<div class="profile-dropdown-item ${isActive ? 'active-profile' : ''}" onclick="switchAccount('${a.id}')">
+      ${avatarHtml}
+      <span style="flex:1;">${escHtml(a.name)}</span>
+      ${isActive ? '<span style="font-size:10px;color:var(--accent);">●</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleProfileDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('profileDropdown');
+  const isOpen = dd.classList.contains('open');
+  if (!isOpen) { renderProfileSwitchList(); }
+  dd.classList.toggle('open', !isOpen);
+  document.getElementById('profileChevron').textContent = isOpen ? '▲' : '▼';
+}
+
+function closeProfileDropdown() {
+  document.getElementById('profileDropdown').classList.remove('open');
+  document.getElementById('profileChevron').textContent = '▲';
+}
+
+document.addEventListener('click', () => closeProfileDropdown());
+
+// ═══════════════════════════════════════════════
+// ACCOUNT-SPECIFIC DATA ACTIONS
+// ═══════════════════════════════════════════════
+function exportCurrentProfileData() {
+  const acct = activeAccountId ? accounts.find(a => a.id === activeAccountId) : null;
+  const data = acct ? acct.db : db;
+  const name = acct ? acct.name.replace(/\s+/g,'_') : 'GoodFit';
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GoodFit_${name}_${todayStr()}.json`;
+  a.click();
+  toast('Profile data exported ✓');
+}
+
+function importProfileData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.exercises || !imported.logs) throw new Error('Invalid');
+      db = imported;
+      if (activeAccountId) {
+        const acct = accounts.find(a => a.id === activeAccountId);
+        if (acct) acct.db = db;
+        saveAccounts();
+      } else {
+        saveDB();
+      }
+      applySettings();
+      renderPage(currentPage);
+      toast(`Imported ${db.exercises.length} exercises, ${db.logs.length} logs ✓`);
+    } catch { toast('Invalid file format', 'error'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function clearCurrentProfileData() {
+  const acct = activeAccountId ? accounts.find(a => a.id === activeAccountId) : null;
+  const label = acct ? `"${acct.name}"` : 'this profile';
+  showConfirm({
+    icon: '⚠️',
+    title: `Clear ${label}?`,
+    message: `This will permanently delete all exercises, logs, and notes for ${label}.`,
+    okLabel: 'Clear Profile',
+    danger: true,
+    onOk: () => {
+      const fresh = { exercises: [], logs: [], notes: [], schedule: [], settings: { ...db.settings } };
+      db = fresh;
+      if (activeAccountId) {
+        const acct = accounts.find(a => a.id === activeAccountId);
+        if (acct) acct.db = db;
+        saveAccounts();
+      } else {
+        saveDB();
+      }
+      toast('Profile cleared', 'info');
+      renderPage(currentPage);
+      if (currentPage === 'settings') renderSettings();
+    }
+  });
+}
+</script>
+
+<script>
+// ═══════════════════════════════════════════════
+// SERVICE WORKER — OFFLINE SUPPORT
+// ═══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  // Build the SW as a blob so we need zero external files
+  const swCode = `
+const CACHE = 'goodfit-v1';
+const ASSETS = [
+  'https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {}))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  // Network-first for navigation (the HTML page itself)
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Cache-first for everything else (fonts, scripts)
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(resp => {
+        if (resp && resp.status === 200) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => cached);
+    })
+  );
+});
+`;
+
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+
+  navigator.serviceWorker.register(swUrl, { scope: '/' })
+    .then(reg => {
+      console.log('[GoodFit] Service worker registered, scope:', reg.scope);
+    })
+    .catch(err => {
+      // Blob SW scope may be restricted on some hosts — silently fail
+      console.warn('[GoodFit] SW registration failed (non-critical):', err.message);
+    });
+}
+</script>
+</body>
+</html>
